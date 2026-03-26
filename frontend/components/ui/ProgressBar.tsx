@@ -5,14 +5,14 @@ interface ProgressBarProps {
 }
 
 export function ProgressBar({ percent, label, sublabel }: ProgressBarProps) {
-  const clamped = Math.min(100, Math.max(0, percent))
+  const clamped = Math.min(100, Math.max(0, percent || 0))
 
   return (
     <div className="w-full">
       <div className="flex justify-between items-baseline mb-1.5">
         {label && <span className="text-xs text-white/50">{label}</span>}
         {sublabel && <span className="text-xs text-white/40 ml-auto mr-2">{sublabel}</span>}
-        <span className="text-xs font-medium" style={{ color: 'var(--accent)' }}>
+        <span className="text-xs font-medium ml-auto" style={{ color: 'var(--accent)' }}>
           {clamped}%
         </span>
       </div>
