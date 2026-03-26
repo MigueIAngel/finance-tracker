@@ -4,3 +4,4 @@ dist/
 drizzle/
 .DS_Store
 .superpowers/
+.worktrees/
