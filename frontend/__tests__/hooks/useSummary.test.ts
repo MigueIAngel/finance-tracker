@@ -1,13 +1,5 @@
 import { describe, it, expect } from 'vitest'
-
-function getLast6Months(currentMonth: number, currentYear: number) {
-  return Array.from({ length: 6 }, (_, i) => {
-    let m = currentMonth - (5 - i)
-    let y = currentYear
-    while (m <= 0) { m += 12; y -= 1 }
-    return { month: m, year: y }
-  })
-}
+import { getLast6Months } from '@/hooks/useSummary'
 
 describe('getLast6Months', () => {
   it('returns 6 months ending in current month', () => {
