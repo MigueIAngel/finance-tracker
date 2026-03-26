@@ -39,11 +39,13 @@ export function MonthlyBars({ summaries, currentMonth, currentYear, onBarClick }
           cursor={false}
           content={({ active, payload, label }) => {
             if (!active || !payload?.length) return null
+            const ingresos = payload.find(p => p.dataKey === 'ingresos')
+            const gastos = payload.find(p => p.dataKey === 'gastos')
             return (
               <div className="rounded-xl px-3 py-2 text-xs" style={{ background: 'rgba(20,17,60,0.97)', border: '1px solid var(--card-border)' }}>
                 <div className="text-white font-medium mb-1">{label}</div>
-                <div style={{ color: '#818cf8' }}>Ingresos: ${Number(payload[0]?.value ?? 0).toFixed(2)}</div>
-                <div style={{ color: '#f87171' }}>Gastos: ${Number(payload[1]?.value ?? 0).toFixed(2)}</div>
+                <div style={{ color: '#818cf8' }}>Ingresos: ${Number(ingresos?.value ?? 0).toFixed(2)}</div>
+                <div style={{ color: '#f87171' }}>Gastos: ${Number(gastos?.value ?? 0).toFixed(2)}</div>
               </div>
             )
           }}
