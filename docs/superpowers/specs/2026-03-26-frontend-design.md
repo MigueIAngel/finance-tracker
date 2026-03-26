@@ -13,6 +13,7 @@ A full-featured personal finance web app that consumes the existing Fastify REST
 - **Framework:** Next.js 15 App Router, TypeScript
 - **Styles:** Tailwind CSS with CSS custom properties for the glassmorphism theme
 - **Charts:** Recharts (`ResponsiveContainer`, `PieChart`, `BarChart`, `LineChart`)
+- **Icons:** Lucide React — used throughout the UI instead of emojis (navigation, actions, badges, buttons)
 - **Data fetching:** SWR — automatic revalidation, cache, loading/error states
 - **Auth:** Next.js middleware checks for a `session` cookie. Login page validates against `APP_PASSWORD` env var. No user accounts or registration.
 - **API proxy:** All calls to the Fastify backend go through Next.js API routes (`/api/*`). The `API_KEY` and backend `BACKEND_URL` are server-side env vars — never exposed to the browser.
