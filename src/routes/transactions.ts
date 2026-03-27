@@ -139,6 +139,22 @@ export async function transactionRoutes(app: FastifyInstance) {
     reply.status(201).send(created)
   })
 
+  // PATCH /transactions/:id — update categoryId
+  app.patch('/transactions/:id', async (req, reply) => {
+    const { id } = req.params as { id: string }
+    const body = z.object({ categoryId: z.number().int().positive() }).safeParse(req.body)
+    if (!body.success) return reply.status(400).send({ error: body.error.flatten() })
+
+    const [updated] = await db
+      .update(transactions)
+      .set({ categoryId: body.data.categoryId })
+      .where(eq(transactions.id, Number(id)))
+      .returning()
+
+    if (!updated) return reply.status(404).send({ error: 'Transaction not found' })
+    reply.send(updated)
+  })
+
   // DELETE /transactions/:id
   app.delete('/transactions/:id', async (req, reply) => {
     const { id } = req.params as { id: string }
