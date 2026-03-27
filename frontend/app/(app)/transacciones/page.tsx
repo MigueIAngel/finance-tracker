@@ -1,7 +1,7 @@
 'use client'
 import { useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { Plus, Trash2 } from 'lucide-react'
+import { Plus, Trash2, Sparkles } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import { Modal } from '@/components/ui/Modal'
@@ -22,6 +22,8 @@ function TransaccionesContent() {
   const [categoryFilter, setCategoryFilter] = useState('')
   const [modalOpen, setModalOpen] = useState(false)
   const [deletingId, setDeletingId] = useState<number | null>(null)
+  const [classifying, setClassifying] = useState(false)
+  const [classifyProgress, setClassifyProgress] = useState<{ done: number; total: number } | null>(null)
 
   const { transactions, mutate } = useTransactions({ month, year, type: (typeFilter || undefined) as TransactionType | undefined })
   const { categories } = useCategories()
@@ -29,6 +31,9 @@ function TransaccionesContent() {
   const displayed = categoryFilter
     ? transactions.filter(t => t.category?.id === Number(categoryFilter))
     : transactions
+
+  const pendingCategory = categories.find(c => c.name.toLowerCase().includes('pendiente'))
+  const pendingTransactions = transactions.filter(t => t.category?.id === pendingCategory?.id)
 
   const handleCreate = async (data: NewTransaction) => {
     await createTransaction(data)
@@ -47,17 +52,71 @@ function TransaccionesContent() {
     }
   }
 
+  const handleClassify = async () => {
+    if (!pendingCategory || pendingTransactions.length === 0) return
+    const otherCategories = categories.filter(c => c.id !== pendingCategory.id)
+    if (otherCategories.length === 0) return
+
+    setClassifying(true)
+    setClassifyProgress({ done: 0, total: pendingTransactions.length })
+
+    let done = 0
+    for (const t of pendingTransactions) {
+      try {
+        const res = await fetch('/api/classify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            note: t.note ?? t.category?.name ?? '',
+            categories: otherCategories,
+          }),
+        })
+        if (res.ok) {
+          const { categoryId } = await res.json()
+          await fetch(`/api/proxy/transactions/${t.id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ categoryId }),
+          })
+        }
+      } catch {
+        // continue with next transaction on error
+      }
+      done++
+      setClassifyProgress({ done, total: pendingTransactions.length })
+    }
+
+    await mutate()
+    setClassifying(false)
+    setClassifyProgress(null)
+  }
+
   const selectStyle = { background: 'rgba(20,17,60,0.97)', border: '1px solid rgba(255,255,255,0.15)', color: 'white' }
 
   return (
     <div className="max-w-3xl mx-auto space-y-5">
       <div className="flex items-center justify-between">
         <h1 className="text-white text-xl font-bold">Transacciones</h1>
-        <button onClick={() => setModalOpen(true)}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-white"
-          style={{ background: 'var(--accent)' }}>
-          <Plus size={16} /> Nueva
-        </button>
+        <div className="flex items-center gap-2">
+          {pendingCategory && pendingTransactions.length > 0 && (
+            <button
+              onClick={handleClassify}
+              disabled={classifying}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium disabled:opacity-60 transition-opacity"
+              style={{ background: 'rgba(167,139,250,0.2)', color: 'var(--accent)', border: '1px solid rgba(167,139,250,0.3)' }}
+            >
+              <Sparkles size={15} />
+              {classifying && classifyProgress
+                ? `Clasificando ${classifyProgress.done}/${classifyProgress.total}...`
+                : `Clasificar ${pendingTransactions.length} pendiente${pendingTransactions.length !== 1 ? 's' : ''}`}
+            </button>
+          )}
+          <button onClick={() => setModalOpen(true)}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-white"
+            style={{ background: 'var(--accent)' }}>
+            <Plus size={16} /> Nueva
+          </button>
+        </div>
       </div>
 
       {/* Filters */}
