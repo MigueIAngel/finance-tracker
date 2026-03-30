@@ -12,6 +12,9 @@ export async function POST(request: NextRequest) {
   const categoryList = categories.map(c => c.name).join(', ')
   const prompt = `Clasifica esta transacción en una de las siguientes categorías. Responde SOLO con el nombre exacto de la categoría, sin explicación ni puntuación adicional.
 
+Contexto personal importante:
+- "Likny" y "Shaday" son el nombre y apodo de la novia del usuario. Cualquier transacción que mencione a Likny, Shaday, o que sea claramente un gasto relacionado con ella (citas, regalos, salidas juntos) debe ir en la categoría "mi amor ❤️" si existe.
+
 Transacción: "${note}"
 
 Categorías disponibles: ${categoryList}

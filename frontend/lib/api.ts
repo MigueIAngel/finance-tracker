@@ -42,6 +42,13 @@ export const createTransaction = (data: NewTransaction) =>
     body: JSON.stringify(data),
   })
 
+export const updateTransaction = (id: number, data: { categoryId?: number; amount?: number }) =>
+  apiFetch<Transaction>(`/api/proxy/transactions/${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  })
+
 export const deleteTransaction = (id: number) =>
   fetch(`/api/proxy/transactions/${id}`, { method: 'DELETE' })
 

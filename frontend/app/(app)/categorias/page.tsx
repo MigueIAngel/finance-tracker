@@ -3,28 +3,31 @@ import { useState } from 'react'
 import { Trash2 } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
+import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import { CategoryForm } from '@/components/forms/CategoryForm'
 import { useCategories } from '@/hooks/useCategories'
 import { createCategory, deleteCategory } from '@/lib/api'
-import type { TransactionType, NewCategory } from '@/types'
+import type { TransactionType, NewCategory, Category } from '@/types'
 
 export default function CategoriasPage() {
   const { categories, mutate } = useCategories()
-  const [deletingId, setDeletingId] = useState<number | null>(null)
+  const [deletingCategory, setDeletingCategory] = useState<Category | null>(null)
+  const [deleteLoading, setDeleteLoading] = useState(false)
 
   const handleCreate = async (data: NewCategory) => {
     await createCategory(data)
     await mutate()
   }
 
-  const handleDelete = async (id: number) => {
-    if (!confirm('¿Eliminar esta categoría? Las transacciones vinculadas quedarán sin categoría.')) return
-    setDeletingId(id)
+  const handleDelete = async () => {
+    if (!deletingCategory) return
+    setDeleteLoading(true)
     try {
-      await deleteCategory(id)
+      await deleteCategory(deletingCategory.id)
       await mutate()
+      setDeletingCategory(null)
     } finally {
-      setDeletingId(null)
+      setDeleteLoading(false)
     }
   }
 
@@ -54,9 +57,11 @@ export default function CategoriasPage() {
                     <span className="text-white text-sm font-medium">{cat.name}</span>
                     <Badge variant={cat.type} />
                   </div>
-                  <button onClick={() => handleDelete(cat.id)} disabled={deletingId === cat.id}
-                    className="p-1.5 rounded-lg transition-colors hover:bg-white/10 disabled:opacity-40"
-                    style={{ color: 'rgba(255,255,255,0.35)' }}>
+                  <button
+                    onClick={() => setDeletingCategory(cat)}
+                    className="p-1.5 rounded-lg transition-colors hover:bg-white/10"
+                    style={{ color: 'rgba(255,255,255,0.35)' }}
+                  >
                     <Trash2 size={15} />
                   </button>
                 </Card>
@@ -74,6 +79,15 @@ export default function CategoriasPage() {
           <CategoryForm onSubmit={handleCreate} />
         </Card>
       </div>
+
+      <ConfirmModal
+        isOpen={deletingCategory !== null}
+        onClose={() => setDeletingCategory(null)}
+        onConfirm={handleDelete}
+        loading={deleteLoading}
+        title="Eliminar categoría"
+        message={`¿Eliminar la categoría "${deletingCategory?.name}"? Las transacciones vinculadas quedarán sin categoría.`}
+      />
     </div>
   )
 }
