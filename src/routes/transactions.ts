@@ -139,15 +139,25 @@ export async function transactionRoutes(app: FastifyInstance) {
     reply.status(201).send(created)
   })
 
-  // PATCH /transactions/:id — update categoryId
+  // PATCH /transactions/:id — update categoryId and/or amount
   app.patch('/transactions/:id', async (req, reply) => {
     const { id } = req.params as { id: string }
-    const body = z.object({ categoryId: z.number().int().positive() }).safeParse(req.body)
+    const body = z.object({
+      categoryId: z.number().int().positive().optional(),
+      amount: z.number().positive().optional(),
+    }).safeParse(req.body)
     if (!body.success) return reply.status(400).send({ error: body.error.flatten() })
+    if (!body.data.categoryId && !body.data.amount) {
+      return reply.status(400).send({ error: 'Provide at least categoryId or amount' })
+    }
+
+    const patch: Record<string, unknown> = {}
+    if (body.data.categoryId) patch.categoryId = body.data.categoryId
+    if (body.data.amount) patch.amount = String(body.data.amount)
 
     const [updated] = await db
       .update(transactions)
-      .set({ categoryId: body.data.categoryId })
+      .set(patch)
       .where(eq(transactions.id, Number(id)))
       .returning()
 
