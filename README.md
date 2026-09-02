@@ -40,7 +40,9 @@ Panel del mes en curso con:
   «pendiente», aparece un botón que reasigna esas transacciones a la categoría
   que corresponda a partir del texto de la nota, una por una y mostrando el
   progreso. Requiere `GEMINI_API_KEY` (ver *Variables de entorno*); sin esa
-  clave el resto de la app funciona igual.
+  clave el resto de la app funciona igual. `CLASSIFY_CONTEXT` permite añadir
+  pistas propias al prompt (apodos, sitios habituales, gastos compartidos) sin
+  escribirlas en el código.
 
 ### Categorías
 
@@ -82,7 +84,7 @@ npm run dev               # http://localhost:3000
 ```bash
 cd frontend
 npm install
-# crear frontend/.env.local (ver más abajo)
+cp .env.example .env.local   # y rellenar los valores
 npm run dev               # http://localhost:3001 si la API ocupa el 3000
 ```
 
@@ -107,6 +109,7 @@ npm run dev               # http://localhost:3001 si la API ocupa el 3000
 | `APP_PASSWORD`   | Contraseña de acceso a la web.                                     |
 | `SESSION_SECRET` | Secreto para firmar el JWT de sesión (cadena larga y aleatoria).    |
 | `GEMINI_API_KEY` | Opcional. Habilita el botón «Clasificar pendientes».               |
+| `CLASSIFY_CONTEXT` | Opcional. Pistas en texto libre que se inyectan en el prompt de clasificación (apodos, sitios habituales, gastos compartidos). |
 
 ---
 

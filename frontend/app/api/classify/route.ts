@@ -3,6 +3,10 @@ import { NextRequest, NextResponse } from 'next/server'
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY!
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemma-3-4b-it:generateContent?key=${GEMINI_API_KEY}`
 
+// Optional free-text hints that help the model map notes to categories
+// (nicknames, recurring places, shared expenses...). Kept out of the repo.
+const CLASSIFY_CONTEXT = process.env.CLASSIFY_CONTEXT?.trim()
+
 export async function POST(request: NextRequest) {
   const { note, categories } = await request.json() as {
     note: string
@@ -10,11 +14,12 @@ export async function POST(request: NextRequest) {
   }
 
   const categoryList = categories.map(c => c.name).join(', ')
+  const contextBlock = CLASSIFY_CONTEXT
+    ? `\nContexto personal importante:\n${CLASSIFY_CONTEXT}\n`
+    : ''
+
   const prompt = `Clasifica esta transacción en una de las siguientes categorías. Responde SOLO con el nombre exacto de la categoría, sin explicación ni puntuación adicional.
-
-Contexto personal importante:
-- "Likny" y "Shaday" son el nombre y apodo de la novia del usuario. Cualquier transacción que mencione a Likny, Shaday, o que sea claramente un gasto relacionado con ella (citas, regalos, salidas juntos) debe ir en la categoría "mi amor ❤️" si existe.
-
+${contextBlock}
 Transacción: "${note}"
 
 Categorías disponibles: ${categoryList}
