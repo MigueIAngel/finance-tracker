@@ -127,6 +127,7 @@ npm run dev               # http://localhost:3001 si la API ocupa el 3000
 | `APP_PASSWORD`   | Contraseña de acceso a la web.                                     |
 | `SESSION_SECRET` | Secreto para firmar el JWT de sesión (cadena larga y aleatoria).    |
 | `GEMINI_API_KEY` | Opcional. Habilita el botón «Clasificar pendientes».               |
+| `GEMINI_MODEL`   | Opcional. Modelo para clasificar (por defecto `gemini-3.5-flash-lite`). |
 | `CLASSIFY_CONTEXT` | Opcional. Pistas en texto libre que se inyectan en el prompt de clasificación (apodos, sitios habituales, gastos compartidos). |
 
 ---
