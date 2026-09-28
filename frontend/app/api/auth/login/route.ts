@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSessionToken } from '@/lib/auth'
+import { isDemoMode } from '@/lib/demo'
 
 export async function POST(request: NextRequest) {
-  const { password } = await request.json()
+  const { password, guest } = await request.json()
 
-  if (!password || password !== process.env.APP_PASSWORD) {
+  // In the public demo anyone can enter as a guest; the password is still required elsewhere.
+  const guestAllowed = isDemoMode && guest === true
+  if (!guestAllowed && (!password || password !== process.env.APP_PASSWORD)) {
     return NextResponse.json({ error: 'Contraseña incorrecta' }, { status: 401 })
   }
 
