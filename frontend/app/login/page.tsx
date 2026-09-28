@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { LockKeyhole, Eye, EyeOff } from 'lucide-react'
+import { isDemoMode } from '@/lib/demo'
 
 export default function LoginPage() {
   const [password, setPassword] = useState('')
@@ -10,15 +11,14 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
-  const handleSubmit = async (e: React.SyntheticEvent) => {
-    e.preventDefault()
+  const login = async (body: { password: string } | { guest: true }) => {
     setLoading(true)
     setError('')
 
     const res = await fetch('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password }),
+      body: JSON.stringify(body),
     })
 
     if (res.ok) {
@@ -29,6 +29,11 @@ export default function LoginPage() {
       setError(data.error ?? 'Error al iniciar sesión')
       setLoading(false)
     }
+  }
+
+  const handleSubmit = (e: React.SyntheticEvent) => {
+    e.preventDefault()
+    void login({ password })
   }
 
   return (
@@ -42,9 +47,31 @@ export default function LoginPage() {
             <LockKeyhole size={28} style={{ color: 'var(--accent)' }} />
           </div>
           <h1 className="text-white text-xl font-bold">Finance Tracker</h1>
-          <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.5)' }}>Ingresa tu contraseña para continuar</p>
+          <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.5)' }}>
+            {isDemoMode ? 'Demo pública con datos ficticios' : 'Ingresa tu contraseña para continuar'}
+          </p>
         </div>
 
+        {isDemoMode ? (
+          <div className="space-y-4">
+            <p className="text-sm text-center" style={{ color: 'rgba(255,255,255,0.7)' }}>
+              Explora la app con seis meses de movimientos de ejemplo. Puedes crear, editar y borrar
+              lo que quieras: los datos se reinician cuando el servidor se reinicia.
+            </p>
+            {error && (
+              <p className="text-sm text-center" style={{ color: 'var(--danger)' }}>{error}</p>
+            )}
+            <button
+              type="button"
+              onClick={() => void login({ guest: true })}
+              disabled={loading}
+              className="w-full py-3 rounded-xl text-white font-medium text-sm transition-opacity disabled:opacity-60"
+              style={{ background: 'var(--accent)' }}
+            >
+              {loading ? 'Entrando...' : 'Entrar como invitado'}
+            </button>
+          </div>
+        ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="relative">
             <input
@@ -82,6 +109,7 @@ export default function LoginPage() {
             {loading ? 'Verificando...' : 'Entrar'}
           </button>
         </form>
+        )}
       </div>
     </div>
   )

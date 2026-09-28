@@ -42,6 +42,15 @@ app.addHook('onReady', async () => {
   app.log.info('Default categories seeded')
 })
 
+// Public demo: fill the embedded database with fictional data
+app.addHook('onReady', async () => {
+  const { isDemoDatabase } = await import('./db/index.js')
+  if (!isDemoDatabase) return
+  const { seedDemoData } = await import('./db/demo-seed.js')
+  await seedDemoData()
+  app.log.info('Demo data seeded')
+})
+
 const port = Number(process.env.PORT) || 3000
 
 try {

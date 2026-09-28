@@ -12,6 +12,24 @@ El frontend nunca habla directo con la API: pasa por rutas proxy en
 `frontend/app/api/proxy/*`, que añaden la `x-api-key` en el servidor para que la
 clave nunca llegue al navegador.
 
+## Demo pública
+
+- **Web:** https://finance-tracker-demo.onrender.com (botón «Entrar como invitado»)
+- Datos **ficticios**: seis meses de movimientos, planes de ahorro y gastos pendientes de
+  clasificar. Se reinician cuando el servidor se reinicia.
+- Corre en el plan gratuito de Render: si lleva un rato sin uso, la primera carga puede
+  tardar hasta un minuto.
+
+La demo es un despliegue aparte y **nunca toca la base de datos real**:
+
+- La API arranca con `DATABASE_URL=pglite:memory`, que usa PGlite, un PostgreSQL
+  compilado a WebAssembly que corre en memoria. La imagen
+  [`deploy/demo/Dockerfile`](deploy/demo/Dockerfile) crea la base vacía al construirse y
+  la API la llena con datos de ejemplo al arrancar (`src/db/demo-seed.ts`).
+- La web se construye con `NEXT_PUBLIC_DEMO_MODE=true`, que muestra el acceso de invitado
+  en lugar de la contraseña. Sin esa variable, el login sigue pidiendo `APP_PASSWORD`
+  como siempre.
+
 ---
 
 ## Uso de la app
