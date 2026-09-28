@@ -14,7 +14,7 @@ clave nunca llegue al navegador.
 
 ## Demo pública
 
-- **Web:** https://finance-tracker-demo.onrender.com (botón «Entrar como invitado»)
+- **Web:** https://finance-tracker-demo-u2s6.onrender.com (botón «Entrar como invitado»)
 - Datos **ficticios**: seis meses de movimientos, planes de ahorro y gastos pendientes de
   clasificar. Se reinician cuando el servidor se reinicia.
 - Corre en el plan gratuito de Render: si lleva un rato sin uso, la primera carga puede
